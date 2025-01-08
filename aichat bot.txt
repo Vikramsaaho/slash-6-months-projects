@@ -1,0 +1,38 @@
+pip install openai
+import openai
+
+# Set up your OpenAI API key
+openai.api_key = "your_openai_api_key_here"
+
+def ai_chatbot():
+    print("AI Chatbot: Hello! I am an AI chatbot. How can I assist you today?")
+    print("Type 'exit' to end the chat.\n")
+    
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ['exit', 'quit']:
+            print("AI Chatbot: Goodbye! Have a great day!")
+            break
+        
+        try:
+            # Generate a response from OpenAI
+            response = openai.Completion.create(
+                engine="text-davinci-003",  # Use the latest model for accurate results
+                prompt=f"You are a helpful chatbot. User: {user_input}\nAI:",
+                max_tokens=150,
+                temperature=0.7
+            )
+            reply = response['choices'][0]['text'].strip()
+            print(f"AI Chatbot: {reply}")
+        except Exception as e:
+            print(f"AI Chatbot: Oops! Something went wrong. ({e})")
+
+if __name__ == "__main__":
+    ai_chatbot()
+
+output :
+AI Chatbot: Hello! I am an AI chatbot. How can I assist you today?
+You: What's the weather like today?
+AI Chatbot: I'm sorry, I can't provide real-time weather information, but you can check weather apps for accurate data.
+You: Thank you!
+AI Chatbot: You're welcome! Let me know if there's anything else I can help with.

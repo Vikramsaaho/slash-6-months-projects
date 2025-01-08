@@ -1,0 +1,85 @@
+pip install speechrecognition pyttsx3 pyaudio openai
+import speech_recognition as sr
+import pyttsx3
+import openai
+
+# Set up OpenAI API Key (optional for advanced responses)
+openai.api_key = "your_openai_api_key_here"
+
+def speak(text):
+    """Convert text to speech."""
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+
+def listen():
+    """Capture and recognize voice input."""
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        recognizer.adjust_for_ambient_noise(source)  # Adjust for background noise
+        try:
+            audio = recognizer.listen(source, timeout=5)
+            query = recognizer.recognize_google(audio)
+            print(f"You said: {query}")
+            return query.lower()
+        except sr.UnknownValueError:
+            print("Sorry, I didn't catch that. Please repeat.")
+            speak("Sorry, I didn't catch that. Please repeat.")
+        except sr.RequestError:
+            print("Unable to connect to speech recognition service.")
+            speak("Unable to connect to speech recognition service.")
+        except Exception as e:
+            print(f"Error: {e}")
+            speak("An error occurred. Please try again.")
+        return None
+
+def ai_response(query):
+    """Generate a response using OpenAI GPT."""
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=f"You are a helpful assistant. User: {query}\nAI:",
+            max_tokens=100,
+            temperature=0.7,
+        )
+        reply = response['choices'][0]['text'].strip()
+        return reply
+    except Exception as e:
+        return f"Sorry, I couldn't process your request. ({e})"
+
+def main():
+    speak("Hello! I am your voice assistant. How can I help you?")
+    while True:
+        query = listen()
+        if query:
+            if "exit" in query or "quit" in query:
+                speak("Goodbye! Have a great day!")
+                break
+            elif "time" in query:
+                from datetime import datetime
+                current_time = datetime.now().strftime("%I:%M %p")
+                speak(f"The current time is {current_time}.")
+            elif "your name" in query:
+                speak("I am your voice assistant. You can call me Assistant.")
+            else:
+                # Generate a response using AI
+                response = ai_response(query)
+                print(f"Assistant: {response}")
+                speak(response)
+
+if __name__ == "__main__":
+    main()
+
+output :
+
+Assistant: Hello! I am your voice assistant. How can I help you?
+You: What time is it?
+Assistant: The current time is 10:30 AM.
+You: What's your name?
+Assistant: I am your voice assistant. You can call me Assistant.
+You: Tell me a joke.
+Assistant: Why don’t skeletons fight each other? They don’t have the guts!
+You: Exit.
+Assistant: Goodbye! Have a great day!
+

@@ -1,0 +1,67 @@
+sudo apt-get update
+sudo apt-get install python3-pip
+pip3 install opencv-python numpy pytesseract tensorflow
+import cv2
+
+# Initialize the camera
+cap = cv2.VideoCapture(0)  # 0 for default camera
+if not cap.isOpened():
+    print("Error: Could not open camera.")
+    exit()
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("Error: Could not read frame.")
+        break
+
+    cv2.imshow("Camera Feed", frame)
+    
+    # Exit on pressing 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+pip3 install torch torchvision
+git clone https://github.com/ultralytics/yolov5.git
+cd yolov5
+pip3 install -r requirements.txt
+import torch
+import cv2
+
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s')  # Load YOLOv5 model
+cap = cv2.VideoCapture(0)
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    results = model(frame)  # Detect objects
+    results.render()  # Render bounding boxes
+
+    # Display the frame
+    cv2.imshow('License Plate Detection', results.imgs[0])
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+sudo apt-get install tesseract-ocr
+pip3 install pytesseract
+import pytesseract
+from PIL import Image
+import cv2
+
+def extract_text(plate_image):
+    gray = cv2.cvtColor(plate_image, cv2.COLOR_BGR2GRAY)
+    text = pytesseract.image_to_string(gray, config='--psm 8')  # Optimize for single-line text
+    return text.strip()
+
+# Example usage with a cropped license plate image
+plate_image = cv2.imread('license_plate.jpg')
+license_text = extract_text(plate_image)
+print(f"License Plate Text: {license_text}")
+
